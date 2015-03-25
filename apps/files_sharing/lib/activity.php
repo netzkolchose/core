@@ -19,6 +19,7 @@ use OCP\Activity\IExtension;
 use OCP\IURLGenerator;
 
 class Activity implements IExtension {
+	const FILES_SHARING_APP = 'files_sharing';
 	/**
 	 * Filter with all sharing related activities
 	 */
@@ -63,7 +64,7 @@ class Activity implements IExtension {
 	}
 
 	protected function getL10N($languageCode = null) {
-		return $this->languageFactory->get('files_sharing', $languageCode);
+		return $this->languageFactory->get(self::FILES_SHARING_APP, $languageCode);
 	}
 
 	/**
@@ -137,7 +138,7 @@ class Activity implements IExtension {
 	public function translate($app, $text, $params, $stripPath, $highlightParams, $languageCode) {
 		$l = $this->getL10N($languageCode);
 
-		if ($app === 'files_sharing') {
+		if ($app === self::FILES_SHARING_APP) {
 			switch ($text) {
 				case self::SUBJECT_REMOTE_SHARE_RECEIVED:
 					return (string) $l->t('You received a new remote share from %s', $params);
@@ -151,9 +152,6 @@ class Activity implements IExtension {
 					return (string) $l->t('Public shared folder %1$s was downloaded', $params);
 				case self::SUBJECT_PUBLIC_SHARED_FILE_DOWNLOADED:
 					return (string) $l->t('Public shared file %1$s was downloaded', $params);
-			}
-		} else if ($app === 'files') {
-			switch ($text) {
 				case self::SUBJECT_SHARED_USER_SELF:
 					return (string) $l->t('You shared %1$s with %2$s', $params);
 				case self::SUBJECT_SHARED_GROUP_SELF:
@@ -180,7 +178,7 @@ class Activity implements IExtension {
 	 * @return array|false
 	 */
 	public function getSpecialParameterList($app, $text) {
-		if ($app === 'files_sharing') {
+		if ($app === self::FILES_SHARING_APP) {
 			switch ($text) {
 				case self::SUBJECT_REMOTE_SHARE_RECEIVED:
 					return array(
@@ -198,9 +196,6 @@ class Activity implements IExtension {
 					return array(
 						0 => 'file',
 					);
-			}
-		} else if ($app === 'files') {
-			switch ($text) {
 				case self::SUBJECT_SHARED_LINK_SELF:
 				case self::SUBJECT_SHARED_USER_SELF:
 				case self::SUBJECT_SHARED_WITH_BY:
@@ -250,7 +245,7 @@ class Activity implements IExtension {
 	}
 
 	/**
-	 * The extension can check if a customer filter (given by a query string like filter=abc) is valid or not.
+	 * The extension can check if a custom filter (given by a query string like filter=abc) is valid or not.
 	 *
 	 * @param string $filterValue
 	 * @return boolean
@@ -287,8 +282,8 @@ class Activity implements IExtension {
 	public function getQueryForFilter($filter) {
 		if ($filter === self::FILTER_SHARES) {
 			return [
-				'(`app` = ? or `app` = ?)',
-				['files_sharing', 'files'],
+				'`app` = ?',
+				[self::FILES_SHARING_APP,],
 			];
 		}
 		return false;
